@@ -1,0 +1,260 @@
+<div>
+  <p-toast position="top-right"></p-toast>
+
+  <div class="grid">
+    <header class="col-12 flex align-items-center justify-content-between">
+      <!-- Add Modal -->
+      <div class="modal-wrapper">
+        <p-dialog
+          header="Title"
+          [(visible)]="addModalDisplay"
+          [dismissableMask]="true"
+          [modal]="true"
+          [draggable]="false"
+          [style]="{ 'min-width': '20rem' }"
+        >
+          <ng-template pTemplate="header"> THÊM CHI TIÊU </ng-template>
+
+          <form
+            [formGroup]="addTransaction"
+            class="form-container"
+            (ngSubmit)="submitAddTransaction()"
+          >
+            <div class="input-section">
+              <p-calendar
+                inputId="time"
+                formControlName="time"
+                appendTo="body"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '270px' }"
+                name="time"
+                [showButtonBar]="true"
+              ></p-calendar>
+              <label for="time">Thời gian </label>
+            </div>
+
+            <div class="input-section">
+              <input
+                inputId="title"
+                type="text"
+                pInputText
+                formControlName="title"
+                [style]="{ width: '270px' }"
+                name="title"
+              />
+              <label for="title">Ghi chú</label>
+            </div>
+
+            <div class="input-section">
+              <p-inputNumber
+                inputId="amount"
+                mode="currency"
+                currency="VND"
+                locale="vi-VN"
+                formControlName="amount"
+                [style]="{ width: '270px' }"
+                [required]="true"
+                [min]="0"
+                name="amount"
+              ></p-inputNumber>
+              <label for="amount">Số tiền</label>
+            </div>
+
+            <div class="input-section">
+              <p-dropdown
+                inputId="members"
+                [options]="roomData.userList"
+                formControlName="user"
+                appendTo="body"
+                [style]="{ width: '270px' }"
+                placeholder="-- Chọn --"
+              ></p-dropdown>
+              <label for="members">Người thực hiện</label>
+            </div>
+            <button
+              pButton
+              type="submit"
+              class="p-button-raised"
+              [disabled]="!addTransaction.valid"
+            >
+              Thêm
+            </button>
+          </form>
+        </p-dialog>
+
+        <button
+          pButton
+          type="button"
+          class="p-button-raised p-1"
+          (click)="showAddDialog()"
+        >
+          <i class="las la-plus-circle p-1 text-4xl"></i>Thêm chi tiêu
+        </button>
+      </div>
+
+      <!-- Calculate Modal -->
+      <div class="modal-wrapper">
+        <p-dialog
+          header="Title"
+          [(visible)]="calculateModalDisplay"
+          [dismissableMask]="true"
+          [modal]="true"
+          [draggable]="false"
+          [style]="{ width: '20rem' }"
+        >
+          <ng-template pTemplate="header"> TÍNH TIỀN </ng-template>
+
+          <div class="calculate-list">
+            <ul>
+              <li
+                *ngFor="let member of memberAmount"
+                class="list-none text-xl p-2"
+              >
+                {{ member.name }}:
+                <span
+                  [ngClass]="{
+                    negative: member.amount < 0,
+                    positive: member.amount > 0
+                  }"
+                  >{{ member.amount | currency: "VND" }}</span
+                >
+              </li>
+            </ul>
+          </div>
+          <p-divider></p-divider>
+          <div class="w-100">
+            Tips: Những thành viên có khoản tiền
+            <span class="negative">màu đỏ</span> sẽ đóng chung lại và chia cho
+            những thành viên có khoản tiền
+            <span class="positive">màu xanh</span> với số tiền tương ứng
+            <br />
+            <em
+              >Sai số ở đơn vị nhỏ là không đáng kể và tôi cũng lười sửa nó</em
+            >
+          </div>
+        </p-dialog>
+
+        <button
+          pButton
+          type="button"
+          class="p-button-raised p-1 p-button-success"
+          (click)="showCalculateDialog()"
+        >
+          <i class="las la-calculator p-1 text-4xl"></i>Tính tiền
+        </button>
+      </div>
+
+      <!-- EditRoom Modal -->
+      <div class="modal-wrapper">
+        <p-dialog
+          header="Title"
+          [(visible)]="editModalDisplay"
+          [modal]="true"
+          [dismissableMask]="true"
+          [draggable]="false"
+          [style]="{ width: '320px' }"
+        >
+          <ng-template pTemplate="header"> SỬA THÔNG TIN PHÒNG </ng-template>
+
+          <form
+            [formGroup]="editRoom"
+            class="form-container"
+            (ngSubmit)="submitEditRoom()"
+          >
+            <div class="input-section">
+              <input
+                inputId="roomName"
+                type="text"
+                pInputText
+                formControlName="roomName"
+                [style]="{ width: '270px' }"
+                name="roomName"
+              />
+              <label for="roomName">Tên phòng</label>
+            </div>
+
+            <div class="input-section">
+              <p-chips
+                formControlName="userList"
+                inputId="members"
+                [style]="{ width: '270px' }"
+                separator=","
+              ></p-chips>
+              <label for="members">Danh sách thành viên</label>
+            </div>
+
+            <button
+              pButton
+              type="submit"
+              class="p-button-raised"
+              [disabled]="!editRoom.valid"
+            >
+              Cập nhật
+            </button>
+          </form>
+
+          <p-confirmDialog
+            header="Are you sủe"
+            icon="pi pi-exclamation-triangle"
+          ></p-confirmDialog>
+
+          <button
+            (click)="handleDeleteData()"
+            pButton
+            icon="pi pi-trash"
+            label="Xoá chi tiêu"
+            class="p-button-danger p-button-raised mt-2"
+          ></button>
+
+          <p-divider></p-divider>
+          <div class="w-100">
+            Tips: Bạn nên xoá hết lịch sử chi tiêu trước khi chỉnh sửa danh sách
+            thành viên trong phòng!
+          </div>
+        </p-dialog>
+
+        <button
+          pButton
+          type="button"
+          class="p-button-raised p-1"
+          (click)="showEditDialog()"
+        >
+          <i class="las la-edit p-1 text-4xl"></i>Sửa thông tin phòng
+        </button>
+      </div>
+    </header>
+
+    <div class="col-12">
+      <div class="transaction-list">
+        <h3>Lịch sử chi tiêu</h3>
+        <p-table
+          [value]="transactionData"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="400px"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="date">
+                Thời gian <p-sortIcon field="date"></p-sortIcon>
+              </th>
+              <th pSortableColumn="amount">
+                Số tiền <p-sortIcon field="amount"></p-sortIcon>
+              </th>
+              <th>Ghi chú</th>
+              <th>Người thực hiện</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-transaction>
+            <tr>
+              <td>{{ transaction.time | date: "dd/MM/YYYY" }}</td>
+              <td>{{ transaction.amount | currency: "VND" }}</td>
+              <td>{{ transaction.title }}</td>
+              <td>{{ transaction.user }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

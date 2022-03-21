@@ -1,0 +1,25 @@
+.input-section {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  position: relative;
+  label {
+    position: absolute;
+    top: 0;
+    font-size: 0.9rem;
+    transform: translateY(28%);
+    left: 1rem;
+    background-color: #fff;
+  }
+}
+
+.form-container {
+  margin-top: 3px;
+}
+
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}

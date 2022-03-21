@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.app-container {
+  display: flex;
+  overflow: hidden;
+  flex: 1;
+}
+
+.app-content {
+  padding: 20px;
+  flex: 1;
+}

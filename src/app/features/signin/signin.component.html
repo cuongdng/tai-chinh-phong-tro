@@ -1,42 +1,50 @@
-<h3>Sign In</h3>
-<div class="formGroup">
-  <input
-    type="text"
-    class="formControl"
-    placeholder="Username"
-    #userName
-    required
-  />
-</div>
-<div class="formGroup">
-  <input
-    type="password"
-    class="formControl"
-    placeholder="Password"
-    #userPassword
-    required
-  />
-</div>
-<!-- Calling SignIn Api from AuthService -->
-<div class="formGroup">
-  <input
-    type="button"
-    class="btn btnPrimary"
-    value="Log in"
-    (click)="authService.SignIn(userName.value, userPassword.value)"
-  />
-</div>
-<div class="formGroup">
-  <span class="or"><span class="orInner">Or</span></span>
-</div>
-
-<div class="forgotPassword">
-  <span routerLink="/forgot-password">Forgot Password?</span>
-</div>
-<div class="redirectToLogin">
-  <span
-    >Don't have an account?<span class="redirect" routerLink="/sign-up">
-      Sign Up</span
-    ></span
+<div class="w-full h-full flex flex-column align-items-center">
+  <h3 class="mb-4">ĐĂNG NHẬP</h3>
+  <div class="p-inputgroup w-20rem mb-2">
+    <input
+      pInputText
+      type="text"
+      class="formControl"
+      placeholder="Email*"
+      #userName
+      required
+    />
+  </div>
+  <div class="p-inputgroup w-20rem mb-2">
+    <input
+      pPassword
+      type="password"
+      class="formControl"
+      placeholder="Mật khẩu*"
+      [feedback]="false"
+      #userPassword
+      required
+    />
+  </div>
+  <!-- Calling SignIn Api from AuthService -->
+  <div
+    class="p-inputgroup w-20rem mb-2 flex justify-content-center align-items-center"
   >
+    <input
+      pButton
+      type="button"
+      class="p-button-raised"
+      value="Đăng nhập"
+      (click)="authService.SignIn(userName.value, userPassword.value)"
+    />
+  </div>
+
+  <div class="forgotPassword cursor-pointer hover:text-blue-500">
+    <span routerLink="/forgot-password">Quên mật khẩu?</span>
+  </div>
+  <div class="redirectToLogin">
+    <span
+      >Bạn chưa có tài khoản?<span
+        class="cursor-pointer hover:text-blue-500"
+        routerLink="/sign-up"
+      >
+        Đăng ký</span
+      ></span
+    >
+  </div>
 </div>

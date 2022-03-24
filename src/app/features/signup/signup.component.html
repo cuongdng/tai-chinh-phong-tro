@@ -1,36 +1,42 @@
-<h3>Sign Up</h3>
-<div class="formGroup">
-  <input
-    type="email"
-    class="formControl"
-    placeholder="Email Address"
-    #userEmail
-    required
-  />
-</div>
-<div class="formGroup">
-  <input
-    type="password"
-    class="formControl"
-    placeholder="Password"
-    #userPwd
-    required
-  />
-</div>
-<div class="formGroup">
-  <input
-    type="button"
-    class="btn btnPrimary"
-    value="Sign Up"
-    (click)="authService.SignUp(userEmail.value, userPwd.value)"
-  />
-</div>
-<div class="formGroup">
-  <span class="or"><span class="orInner">Or</span></span>
-</div>
-<div class="redirectToLogin">
-  <span
-    >Already have an account?
-    <span class="redirect" routerLink="/sign-in">Log In</span></span
+<div class="w-full h-full flex flex-column align-items-center">
+  <h3 class="mb-4">ĐĂNG KÝ</h3>
+  <div class="p-inputgroup w-20rem mb-2">
+    <input
+      pInputText
+      type="email"
+      placeholder="Email đăng ký*"
+      #userEmail
+      required
+    />
+  </div>
+  <div class="p-inputgroup w-20rem mb-2">
+    <input
+      pPassword
+      type="password"
+      placeholder="Mật khẩu*"
+      [feedback]="false"
+      #userPwd
+      required
+    />
+  </div>
+  <div
+    class="p-inputgroup w-20rem mb-2 flex justify-content-center align-items-center"
   >
+    <input
+      pButton
+      type="button"
+      class="p-button-raised"
+      value="Sign Up"
+      (click)="authService.SignUp(userEmail.value, userPwd.value)"
+    />
+  </div>
+
+  <div class="redirectToLogin">
+    <span
+      >Nếu bạn đã có tài khoản?
+      <span class="cursor-pointer hover:text-blue-500" routerLink="/sign-in"
+        >Đăng nhập</span
+      ></span
+    >
+  </div>
 </div>

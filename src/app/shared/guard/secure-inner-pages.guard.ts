@@ -8,19 +8,21 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
-
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class SecureInnerPagesGuard implements CanActivate {
   constructor(public authService: AuthService, public router: Router) {}
-
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.authService.isLoggedIn !== true) {
-      this.router.navigate(['/sign-in']);
+  ):
+    | Observable<boolean | UrlTree>
+    | Promise<boolean | UrlTree>
+    | boolean
+    | UrlTree {
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/app']);
     }
     return true;
   }

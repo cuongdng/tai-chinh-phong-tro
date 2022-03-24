@@ -23,6 +23,7 @@ import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { PasswordModule } from 'primeng/password';
 
 // Service
 import { ConfirmationService } from 'primeng/api';
@@ -36,6 +37,7 @@ import { SpendingComponent } from './features/spending/spending.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { SigninComponent } from './features/signin/signin.component';
 import { SignupComponent } from './features/signup/signup.component';
+import { LoadingComponent } from './shared/loading.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,7 @@ import { SignupComponent } from './features/signup/signup.component';
     HeaderComponent,
     SigninComponent,
     SignupComponent,
+    LoadingComponent,
   ],
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
@@ -69,6 +72,7 @@ import { SignupComponent } from './features/signup/signup.component';
     DropdownModule,
     ConfirmDialogModule,
     ToastModule,
+    PasswordModule,
   ],
   providers: [ConfirmationService, MessageService, AuthService],
   bootstrap: [AppComponent],

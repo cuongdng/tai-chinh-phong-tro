@@ -1,5 +1,16 @@
 <header
-  class="bg-blue-700 h-4rem right-0 left-0 flex justify-content-center align-items-center uppercase text-white z-1"
+  class="bg-blue-700 h-4rem right-0 left-0 flex justify-content-between align-items-center uppercase text-white z-1 pl-3 pr-3"
 >
-  <h1 class="">...</h1>
+  <h1 class="cursor-pointer" routerLink="app">Sona</h1>
+  <button
+    *ngIf="authService.isLoggedIn"
+    pButton
+    type="button"
+    label="Đăng xuất"
+    class="p-button-secondary"
+    (click)="authService.SignOut()"
+  ></button>
+  <!-- <div *ngIf="authService.isLoggedIn">
+
+  </div> -->
 </header>

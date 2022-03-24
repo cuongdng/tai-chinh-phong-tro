@@ -33,7 +33,6 @@ import { AuthService } from './services/auth.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SpendingComponent } from './features/spending/spending.component';
-import { SideMenuComponent } from './shared/side-menu/side-menu.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { SigninComponent } from './features/signin/signin.component';
 import { SignupComponent } from './features/signup/signup.component';
@@ -42,7 +41,6 @@ import { SignupComponent } from './features/signup/signup.component';
   declarations: [
     AppComponent,
     SpendingComponent,
-    SideMenuComponent,
     HeaderComponent,
     SigninComponent,
     SignupComponent,

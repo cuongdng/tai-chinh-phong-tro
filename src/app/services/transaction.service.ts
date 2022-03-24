@@ -7,52 +7,21 @@ import * as _ from 'lodash';
   providedIn: 'root',
 })
 export class TransactionService {
-  private transactions: TransactionModel[] =
-    this.rs.getRoomData().transactionList;
-
-  public getTransactionList(): TransactionModel[] {
-    return this.transactions;
-  }
+  private transactions: TransactionModel[] = [];
 
   public addTransaction(transaction: TransactionModel): void {
     this.transactions.push(transaction);
-  }
-
-  public getTotalAmount(): number {
-    let total: number = 0;
-
-    _.forEach(this.transactions, (value) => {
-      total += value.amount;
-    });
-
-    return total;
   }
 
   public deleteAllTransaction(): void {
     this.transactions = [];
   }
 
-  public getMemberAmount() {
-    const averageAmount = _.round(
-      this.getTotalAmount() / this.rs.getRoomData().userList.length
-    );
-
-    const eachMemberAmount = _.map(this.rs.getRoomData().userList, (user) => {
-      let tmpTotal = 0;
-
-      _.forEach(this.transactions, (transaction) => {
-        if (transaction.user === user) {
-          tmpTotal += transaction.amount;
-        }
-      });
-
-      tmpTotal -= averageAmount;
-
-      return { name: user, amount: tmpTotal };
+  constructor(private rs: RoomService) {
+    this.rs.getTransactionList().subscribe({
+      next: (data) => {
+        this.transactions = data;
+      },
     });
-
-    return eachMemberAmount;
   }
-
-  constructor(private rs: RoomService) {}
 }

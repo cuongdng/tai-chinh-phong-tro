@@ -1,47 +1,75 @@
 import { Injectable } from '@angular/core';
-import { RoomModel } from '../models/room.model';
-import { room } from '../shared/mock/room-data';
+import { environment } from 'src/environments/environment';
+import { TransactionModel } from '../models/transaction.model';
 
 // Firebase
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { initializeApp } from 'firebase/app';
+
+// RxJS
+import { Observable, from, filter, map } from 'rxjs';
+
+const app = initializeApp(environment.firebase);
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoomService {
-  public async getDataFromServer(): Promise<RoomModel> {
-    const db = getFirestore();
-    let roomData: any;
+  // Get current Signed-in user UID
+  userLocalStorage: any = localStorage.getItem('user');
+  uid = JSON.parse(this.userLocalStorage).uid;
 
-    const docRef = doc(db, 'users', 'QSLX0VaPA0Yi2ThF3BTTffPg4nv2');
-    const docSnap = await getDoc(docRef);
+  db = getFirestore(app);
 
-    if (docSnap.exists()) {
-      roomData = docSnap.data();
-      return roomData;
-    } else {
-      console.log('No such document!');
-      return {
-        roomName: 'test',
-        userList: ['tst1', 'tst2'],
-        transactionList: [],
-      };
-    }
+  // Get methods
+
+  public getRoomName(): Observable<string> {
+    return from(getDoc(doc(this.db, 'users', this.uid))).pipe(
+      filter((docSnap) => docSnap.exists()),
+      map((docSnap) => docSnap.get('roomName'))
+    );
   }
 
-  private roomData: RoomModel = room;
-
-  public getRoomData(): RoomModel {
-    return this.roomData;
+  public getTransactionList(): Observable<TransactionModel[]> {
+    return from(getDoc(doc(this.db, 'users', this.uid))).pipe(
+      filter((docSnap) => docSnap.exists()),
+      map((docSnap) => docSnap.get('transactionList'))
+    );
   }
+
+  public getUserList(): Observable<string[]> {
+    return from(getDoc(doc(this.db, 'users', this.uid))).pipe(
+      filter((docSnap) => docSnap.exists()),
+      map((docSnap) => docSnap.get('userList'))
+    );
+  }
+
+  // Update methods
 
   public updateRoomName(newName: string): void {
-    this.roomData.roomName = newName;
+    const dataRef = doc(this.db, 'users', this.uid);
+    setDoc(dataRef, { roomName: newName }, { merge: true }).then(() => {
+      console.log('Name changed!');
+    });
   }
 
   public updateRoomUserList(newUserList: string[]): void {
-    this.roomData.userList = newUserList;
+    const dataRef = doc(this.db, 'users', this.uid);
+    setDoc(dataRef, { userList: newUserList }, { merge: true }).then(() => {
+      console.log('User list changed!');
+    });
+  }
+
+  public updateTransactionList(newTransactionList: TransactionModel[]) {
+    const dataRef = doc(this.db, 'users', this.uid);
+    setDoc(
+      dataRef,
+      { transactionList: newTransactionList },
+      { merge: true }
+    ).then(() => {
+      console.log('Transaction list changed!');
+    });
   }
 
   constructor(

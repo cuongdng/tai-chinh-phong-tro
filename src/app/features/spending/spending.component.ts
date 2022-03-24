@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormsModule } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { Validators } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
-import { RoomModel } from 'src/app/models/room.model';
-import * as _ from 'lodash';
-import { TransactionService } from 'src/app/services/transaction.service';
-import { RoomService } from 'src/app/services/room.service';
-import { TransactionModel } from 'src/app/models/transaction.model';
+
 import { ConfirmationService } from 'primeng/api';
 import { MessageService } from 'primeng/api';
+
+import * as _ from 'lodash';
+
+import { RoomService } from 'src/app/services/room.service';
+import { TransactionModel } from 'src/app/models/transaction.model';
 @Component({
   selector: 'app-spending',
   templateUrl: './spending.component.html',
   styleUrls: ['./spending.component.scss'],
 })
 export class SpendingComponent implements OnInit {
+  // Add new transaction form
   addTransaction = this.fb.group({
     time: ['', Validators.required],
     title: ['', Validators.required],
@@ -22,27 +23,24 @@ export class SpendingComponent implements OnInit {
     user: ['', Validators.required],
   });
 
+  // Edit room info form
   editRoom = this.fb.group({
     roomName: ['', Validators.required],
     userList: ['', Validators.required],
   });
 
-  roomData: RoomModel = this.rs.getRoomData();
+  transactionData: TransactionModel[] = [];
+  roomName: string = '';
+  userList: string[] = [];
+  memberAmount: any[] = [];
 
-  transactionData: TransactionModel[] = this.roomData.transactionList;
-
-  memberAmount: any = this.ts.getMemberAmount();
+  loaded: boolean = false;
 
   addModalDisplay: boolean = false;
   editModalDisplay: boolean = false;
   calculateModalDisplay: boolean = false;
 
-  renewData(): void {
-    this.roomData = this.rs.getRoomData();
-    this.ts.getTransactionList();
-    this.memberAmount = this.ts.getMemberAmount();
-  }
-
+  // MODAL DISPLAY CONTROL
   showAddDialog() {
     this.addModalDisplay = true;
   }
@@ -53,20 +51,14 @@ export class SpendingComponent implements OnInit {
 
   showCalculateDialog() {
     this.calculateModalDisplay = true;
+    this.memberAmount = this.getMemberAmount();
   }
 
-  resetAnyFuckingForm() {
-    this.addTransaction.reset();
-    this.editRoom.setValue({
-      roomName: this.rs.getRoomData().roomName,
-      userList: this.rs.getRoomData().userList,
-    });
-  }
-
+  // ACTION
   submitAddTransaction() {
-    this.ts.addTransaction(this.addTransaction.value);
-    this.resetAnyFuckingForm();
-    this.renewData();
+    this.updateTransaction(this.addTransaction.value);
+    this.updateData();
+    this.addTransaction.reset();
     this.messageService.add({
       severity: 'success',
       summary: 'Thành công',
@@ -74,12 +66,10 @@ export class SpendingComponent implements OnInit {
     });
   }
 
-  async submitEditRoom() {
+  submitEditRoom() {
     this.rs.updateRoomName(this.editRoom.value.roomName);
     this.rs.updateRoomUserList(this.editRoom.value.userList);
-    this.resetAnyFuckingForm();
-    this.renewData();
-    console.log(await this.rs.getDataFromServer());
+    this.updateData();
     this.messageService.add({
       severity: 'success',
       summary: 'Thành công',
@@ -91,8 +81,7 @@ export class SpendingComponent implements OnInit {
     this.confirmationService.confirm({
       message: 'Bạn có chắc muốn xoá lịch sử chi tiêu của phòng?',
       accept: () => {
-        this.ts.deleteAllTransaction();
-        this.renewData();
+        this.deleteAllTransaction();
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
@@ -102,19 +91,101 @@ export class SpendingComponent implements OnInit {
     });
   }
 
+  updateTransaction(transaction: TransactionModel): void {
+    this.transactionData.push(transaction);
+    this.rs.updateTransactionList(this.transactionData);
+  }
+
+  deleteAllTransaction(): void {
+    this.transactionData = [];
+    this.rs.updateTransactionList(this.transactionData);
+  }
+
+  getTotalAmount(): number {
+    let total: number = 0;
+
+    _.forEach(this.transactionData, (value) => {
+      total += value.amount;
+    });
+
+    return total;
+  }
+
+  getMemberAmount() {
+    const averageAmount = _.round(this.getTotalAmount() / this.userList.length);
+
+    const eachMemberAmount = _.map(this.userList, (user) => {
+      let tmpTotal = 0;
+
+      _.forEach(this.transactionData, (transaction) => {
+        if (transaction.user === user) {
+          tmpTotal += transaction.amount;
+        }
+      });
+
+      tmpTotal -= averageAmount;
+
+      return { name: user, amount: tmpTotal };
+    });
+
+    return eachMemberAmount;
+  }
+
+  updateData(): void {
+    this.rs.getUserList().subscribe({
+      next: (data) => {
+        this.userList = data;
+        this.editRoom.patchValue({
+          userList: this.userList,
+        });
+      },
+    });
+    this.rs.getRoomName().subscribe({
+      next: (data) => {
+        this.roomName = data;
+        this.editRoom.patchValue({
+          roomName: this.roomName,
+        });
+      },
+    });
+    this.rs.getTransactionList().subscribe({
+      next: (data) => {
+        this.transactionData = data;
+      },
+    });
+  }
+
   constructor(
     private fb: FormBuilder,
-    private ts: TransactionService,
-    private rs: RoomService,
+    public rs: RoomService,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private authService: AuthService
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
-    this.editRoom.setValue({
-      roomName: this.rs.getRoomData().roomName,
-      userList: this.rs.getRoomData().userList,
+    this.rs.getUserList().subscribe({
+      next: (data) => {
+        this.userList = data;
+        this.editRoom.patchValue({
+          userList: this.userList,
+        });
+      },
+    });
+    this.rs.getRoomName().subscribe({
+      next: (data) => {
+        this.roomName = data;
+        this.editRoom.patchValue({
+          roomName: this.roomName,
+        });
+      },
+    });
+    this.rs.getTransactionList().subscribe({
+      next: (data) => {
+        this.transactionData = data;
+      },
+      complete: () => {
+        this.loaded = true;
+      },
     });
   }
 }

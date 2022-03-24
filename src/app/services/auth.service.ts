@@ -70,11 +70,13 @@ export class AuthService {
         window.alert(error);
       });
   }
+
   // Returns true when user is looged in and email is verified
   get isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user')!);
     return user !== null ? true : false;
   }
+
   // Sign in with Google
   GoogleAuth() {
     return this.AuthLogin(new auth.GoogleAuthProvider()).then((res: any) => {
@@ -83,6 +85,7 @@ export class AuthService {
       }
     });
   }
+
   // Auth logic to run auth providers
   AuthLogin(provider: any) {
     return this.afAuth
@@ -121,6 +124,4 @@ export class AuthService {
       this.router.navigate(['sign-in']);
     });
   }
-
-
 }

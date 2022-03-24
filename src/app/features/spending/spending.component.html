@@ -1,4 +1,17 @@
 <div>
+  <div *ngIf="!loaded">
+    <div class="lds-roller">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
   <p-toast position="top-right"></p-toast>
 
   <div class="grid">
@@ -63,7 +76,7 @@
             <div class="input-section">
               <p-dropdown
                 inputId="members"
-                [options]="roomData.userList"
+                [options]="userList"
                 formControlName="user"
                 appendTo="body"
                 [style]="{ width: '270px' }"
@@ -247,7 +260,7 @@
           </ng-template>
           <ng-template pTemplate="body" let-transaction>
             <tr>
-              <td>{{ transaction.time | date: "dd/MM/YYYY" }}</td>
+              <td>{{ transaction.time.toDate() | date: "dd/MM/yyyy" }}</td>
               <td>{{ transaction.amount | currency: "VND" }}</td>
               <td>{{ transaction.title }}</td>
               <td>{{ transaction.user }}</td>
